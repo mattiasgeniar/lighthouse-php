@@ -2,6 +2,12 @@
 
 All notable changes to `lighthouse-php` will be documented in this file.
 
+## Unreleased
+
+### What's Changed
+
+* Fix orphaned temp files accumulating in `/tmp` during Lighthouse audits
+
 ## 2.0.1 - 2025-11-25
 
 ### What's Changed

@@ -18,7 +18,21 @@
         lighthouseOptions.maxWaitForLoad = maxWaitForLoad;
     }
 
-    const killTimer = setTimeout(() => chrome.kill(), timeoutInMs);
+    /**
+     * Kill Chrome and wait for cleanup to complete.
+     * The 500ms delay works around a race condition in chrome-launcher's kill()
+     * where destroyTmp() runs before Chrome has fully terminated.
+     */
+    const killChrome = async () => {
+        try {
+            chrome.kill();
+            await new Promise(resolve => setTimeout(resolve, 500));
+        } catch {
+            // Ignore errors - process might already be dead
+        }
+    };
+
+    const killTimer = setTimeout(() => killChrome(), timeoutInMs);
 
     const runnerResult = await lighthouse.default(
         requestedUrl,
@@ -28,7 +42,7 @@
 
     clearTimeout(killTimer);
 
-    await chrome.kill();
+    await killChrome();
 
     const output = {
         report: runnerResult.report,
